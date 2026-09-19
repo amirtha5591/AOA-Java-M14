@@ -1,6 +1,7 @@
 
 # EX 4B Frog Jump - Dynamic Programming.
-## DATE:
+## NAME: AMIRTHAVARSHINI.R.D
+## DATE:17.08.26
 ## AIM:
 To write a Java program to for given constraints.
 A Frog Jump 1 or 2 steps at a time.
