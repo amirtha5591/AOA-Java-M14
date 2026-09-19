@@ -1,6 +1,7 @@
 
 # EX 4B Frog Jump - Dynamic Programming.
-## NAME: AMIRTHAVARSHINI.R.D
+## DEVELOPED BY : AMIRTHAVARSHINI.R.D
+## REG NO: 212223040013
 ## DATE:17.08.26
 ## AIM:
 To write a Java program to for given constraints.
