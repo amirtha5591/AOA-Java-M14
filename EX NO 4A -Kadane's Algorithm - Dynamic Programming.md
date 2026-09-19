@@ -1,133 +1,91 @@
-
-# EX 5A 0/1 Knapsack Problem - Branch&Bound 
 ## DEVELOPED BY : AMIRTHAVARSHINI.R.D
 ## REG NO: 212223040013
 ## DATE:17.08.26
+# EX 4A Kadane's Algorithm - Dynamic Programming. 
+
 ## AIM:
-To Write a Java program to solve 0/1 Knapsack problem using Branch and Bound Approach.
-You are heading a college entrepreneurship cell that can invest in up to N student‑startups.
-
-For each startup i you know: cost[i]  — the amount (in ₹ lakh) required to join the showcase profit[i] — the estimated profit (in ₹ lakh) you’ll gain if it succeeds You have a total budget of B ₹ lakh. Pick a subset of startups so that the sum of costs ≤ B and the sum of profits is maximised.
-
-Because N can be as large as 50, a plain exhaustive search (2^N) is too slow.
-
-The recommended approach is Branch & Bound with a fractional‑knapsack upper bound (but any algorithm that meets the constraints is accepted). 
-
-Input Format
-
-N
-
-B
-
-cost[1] cost[2] … cost[N]
-
-profit[1] profit[2] … profit[N]
-
-1 ≤ N ≤ 50
-
-1 ≤ B ≤ 1 000 000
-
-1 ≤ cost[i], profit[i] ≤ 10 000 
-
-Output Format
-
-maxProfit
-
-For example:
-
-
-
+To Write a Java program to solve the below problem using Kadane's Algorithm.
+A solar company installs solar panels around a circular grid of n buildings. Each building either generates or consumes net energy, represented by integers (+ve for generated, -ve for consumed).
 
 ## Algorithm
-1.Start and read the number of startups N, total budget B, and each startup’s cost and profit.
-
-2.Sort the startups in descending order of profit-to-cost ratio to improve bounding efficiency.
-
-3.Define a bound function to compute the upper bound of achievable profit (including fractional profit if budget remains).
-
-4.Use DFS with Branch and Bound:
-
-Explore two possibilities for each startup — include it (if within budget) or exclude it.
-
-Prune any branch where the upper bound ≤ current best profit.
-
-5.Return the highest profit (best) obtained from feasible startup selections within the budget.
-   
+1. Input Reading:
+Read the number of solar panels n and their corresponding energy values into an integer array energy[].
+2. Total Energy Calculation:
+Compute the total sum of all energy values, as it will be used to determine the circular subarray case.
+3. Find Maximum Subarray Sum (Non-Circular Case):
+Use Kadane’s Algorithm to find the maximum subarray sum (maxSum) — representing the best energy output without wrapping around.
+4. Find Minimum Subarray Sum (To Handle Circular Case):
+Use a modified Kadane’s Algorithm to find the minimum subarray sum (minSum).
+The maximum circular energy can then be calculated as wrappedDifference = totalSum - minSum. 
+5.  Determine Final Maximum Energy:
+If all values are negative, return maxSum (since wrapping gives no benefit).
+Otherwise, return the maximum of maxSum and wrappedDifference. 
 
 ## Program:
 ```
+
 import java.util.*;
 
-public class StartupShowcaseOptimizer {
+public class SolarEnergyMaximizer {
 
-    // ---------- Global data ----------
-    static int N, B;
-    static int[] c, p;          // cost, profit after sorting by ratio
-    static int best = 0;        // incumbent best profit
-
-    // ---------- Fractional upper bound ----------
-    static double bound(int idx, int cw, int cv) {
-        if (cw >= B) return cv;                 // bag full or overweight
-        double val = cv;
-        int rem = B - cw;
-
-        while (idx < N && c[idx] <= rem) {      // add full items
-            rem -= c[idx];
-            val += p[idx];
-            idx++;
+    public static int maxCircularEnergy(int[] energy)     {
+        
+        int sum=0;
+        for(int i: energy){
+            sum+=i;
         }
-        if (idx < N) val += p[idx] * (rem / (double) c[idx]); // fractional part
-        return val;
+        int maxSum=maxSubArraySum(energy);
+        int minSum=minSubArraySum(energy);
+        int wrappedDifference=sum-minSum;
+        if(maxSum<0) return maxSum;
+        return Math.max(maxSum,wrappedDifference);
+        
+    }
+    
+    public static int maxSubArraySum(int[] energy){
+        int sum=0,maxSum=energy[0];
+        for(int i:energy){
+            sum+=i;
+            if(sum>maxSum){
+                maxSum=sum;
+            }
+            if(sum<0) sum=0;
+        }
+        return maxSum;
+    }
+    
+    public static int minSubArraySum(int[] energy){
+        int sum=0,minSum=energy[0];
+        for(int i:energy){
+            sum+=i;
+            if(sum<minSum) minSum=sum;
+            if(sum>0) sum=0;
+        }
+        return minSum;
     }
 
-    // ---------- DFS Branch & Bound ----------
-    static void dfs(int idx, int cw, int cv) {
-        if (idx == N) {                 // leaf
-            best = Math.max(best, cv);
-            return;
-        }
-        if (bound(idx, cw, cv) <= best) return; // prune
-
-        // 1. include current startup if it fits
-        if (cw + c[idx] <= B)
-            dfs(idx + 1, cw + c[idx], cv + p[idx]);
-
-        // 2. exclude current startup
-        dfs(idx + 1, cw, cv);
-    }
+    
+    
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        N = sc.nextInt();
-        B = sc.nextInt();
-        int[] cost = new int[N];
-        int[] prof = new int[N];
-        for (int i = 0; i < N; i++) cost[i] = sc.nextInt();
-        for (int i = 0; i < N; i++) prof[i] = sc.nextInt();
-        sc.close();
-
-        // Sort by profit/cost ratio descending → tighter bounds
-        Integer[] idx = new Integer[N];
-        Arrays.setAll(idx, i -> i);
-        Arrays.sort(idx, Comparator.comparingDouble(i -> -(double) prof[i] / cost[i]));
-
-        c = new int[N];
-        p = new int[N];
-        for (int i = 0; i < N; i++) {
-            c[i] = cost[idx[i]];
-            p[i] = prof[idx[i]];
+        int n = sc.nextInt();
+        int[] energy = new int[n];
+        for (int i = 0; i < n; i++) {
+            energy[i] = sc.nextInt();
         }
-
-        dfs(0, 0, 0);
-        System.out.println(best);
+        System.out.println(maxCircularEnergy(energy));
     }
 }
+ 
+
 ```
 
 ## Output:
+<img width="500" height="249" alt="image" src="https://github.com/user-attachments/assets/d8c296f3-457a-4519-8fc9-0bd73edf3864" />
 
-<img width="328" height="208" alt="image" src="https://github.com/user-attachments/assets/e2b69770-db78-47bd-b494-21c1d2fb752e" />
 
 
 ## Result:
-The program successfully solved 0/1 Knapsack problem using branch & bound and output is verified. 
+The program successfully Implemented and the output is verified. 
+ 
